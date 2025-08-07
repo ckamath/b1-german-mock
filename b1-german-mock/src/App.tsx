@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { readingQuestions as allQuestions, ReadingQuestion } from './questions';
+import {
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  Button,
+  LinearProgress,
+  Box,
+  Chip,
+} from '@mui/material';
+import {
+  PlayArrow as PlayArrowIcon,
+  Refresh as RefreshIcon,
+  CheckCircle as CheckCircleIcon,
+} from '@mui/icons-material';
 
 // Section configuration
 const SECTION_ORDER = ['Reading', 'Language', 'Listening', 'Writing', 'Speaking'] as const;
@@ -434,38 +449,70 @@ function App() {
   // MAIN MENU RENDER
   if (showMainMenu) {
     return (
-      <div className="App" style={{ padding: 32, maxWidth: 600, margin: '0 auto', textAlign: 'center' }}>
-        <h1 style={{ marginBottom: 32 }}>B1 German Mock Test</h1>
-        {sections.map((sec, idx) => {
-          const answered = sec.indices.filter(i => userAnswers[i].answer !== null).length;
-          const len = sec.indices.length;
-          const completed = completedSections[idx];
-          const progressPct = Math.round((answered / len) * 100);
-          return (
-            <div key={sec.name} style={{ marginBottom: 24, padding: 16, borderRadius: 8, boxShadow: '0 2px 8px #0001', background: '#fff' }}>
-              <h3 style={{ margin: '0 0 12px 0' }}>{sec.name}</h3>
-              <div style={{ height: 8, background: '#e9ecef', borderRadius: 4, marginBottom: 12 }}>
-                <div style={{ width: `${progressPct}%`, height: '100%', background: completed ? '#28a745' : '#007bff', borderRadius: 4 }} />
-              </div>
-              <p style={{ margin: '0 0 12px 0' }}>{completed ? '✅ Abgeschlossen' : `${answered}/${len} beantwortet`}</p>
-              <button
-                onClick={() => startSection(idx)}
-                style={{
-                  padding: '8px 20px',
-                  borderRadius: 6,
-                  background: completed ? '#6c757d' : '#007bff',
-                  color: '#fff',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                }}
-              >
-                {completed ? 'Wiederholen' : answered > 0 ? 'Fortsetzen' : 'Starten'}
-              </button>
-            </div>
-          );
-        })}
-      </div>
+      <Container maxWidth="md" sx={{ py: 4 }}>
+        <Box textAlign="center" mb={4}>
+          <Typography variant="h2" component="h1" gutterBottom>
+            B1 German Mock Test
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary">
+            Bereiten Sie sich auf Ihre B1-Prüfung vor
+          </Typography>
+        </Box>
+        
+        <Box display="flex" flexDirection="column" gap={3}>
+          {sections.map((sec, idx) => {
+            const answered = sec.indices.filter(i => userAnswers[i].answer !== null).length;
+            const len = sec.indices.length;
+            const completed = completedSections[idx];
+            const progressPct = Math.round((answered / len) * 100);
+            
+            return (
+              <Card key={sec.name} elevation={3} sx={{ transition: 'transform 0.2s', '&:hover': { transform: 'translateY(-2px)' } }}>
+                <CardContent>
+                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                    <Typography variant="h5" component="h3">
+                      {sec.name}
+                    </Typography>
+                    {completed && (
+                      <Chip 
+                        icon={<CheckCircleIcon />} 
+                        label="Abgeschlossen" 
+                        color="success" 
+                        variant="outlined"
+                      />
+                    )}
+                  </Box>
+                  
+                  <Box mb={2}>
+                    <LinearProgress 
+                      variant="determinate" 
+                      value={progressPct} 
+                      sx={{ height: 8, borderRadius: 4 }}
+                      color={completed ? "success" : "primary"}
+                    />
+                  </Box>
+                  
+                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Typography variant="body2" color="text.secondary">
+                      {completed ? 'Alle Fragen beantwortet' : `${answered}/${len} beantwortet`}
+                    </Typography>
+                    
+                    <Button
+                      variant={completed ? "outlined" : "contained"}
+                      color={completed ? "secondary" : "primary"}
+                      onClick={() => startSection(idx)}
+                      startIcon={completed ? <RefreshIcon /> : <PlayArrowIcon />}
+                      size="large"
+                    >
+                      {completed ? 'Wiederholen' : answered > 0 ? 'Fortsetzen' : 'Starten'}
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </Box>
+      </Container>
     );
   }
 
